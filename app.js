@@ -50,6 +50,11 @@ const technologies = [
 ];
 
 function init() {
+  renderCards();
+  renderProgress();
+}
+
+function renderCards() {
   if (technologies.length === 0) {
     content.innerHTML = '<p class="emty">Технологий пока нету, добавьте</p>';
   } else {
@@ -62,7 +67,37 @@ function init() {
     content.innerHTML = technologies.map(toCard).join('');
   }
 }
+function renderProgress() {
+  const percent = computeProgressProcent();
 
+  let backeground;
+  if (percent <= 30) {
+    backeground = '#e75a5a';
+  } else if (percent > 30 && percent < 70) {
+    backeground = '#f99415';
+  } else {
+    backeground = '#73ba3c';
+  }
+
+  progress.style.background = backeground;
+  progress.style.width = `${percent}%`;
+  progress.textContent = percent ? percent + '%' : '';
+}
+
+function computeProgressProcent() {
+  // x -> 100%
+  // 2 -> 5
+  // x = (100 * 2) / 5
+  if (technologies.length === 0) {
+    return 0;
+  }
+  let doneCount = 0;
+  for (let i = 0; i < technologies.length; i++) {
+    if (technologies[i].done) doneCount++;
+  }
+  //Math.round() округляем в меншую сторону
+  return Math.round((100 * doneCount) / technologies.length);
+}
 function toCard(tech) {
   const doneClass = tech.done ? 'done' : '';
   return `
