@@ -10,6 +10,7 @@ modal.addEventListener('change', toggleTech);
 form.addEventListener('submit', createTech);
 
 const APP_TITLE = document.title;
+const LS_KEY = 'MY_TECHS';
 //
 // setTimeout(() => {
 //   modal.classList.remove('open');
@@ -43,6 +44,7 @@ function toggleTech(event) {
   const type = event.target.dataset.type;
   const tech = technologies.find((t) => t.type === type);
   tech.done = event.target.checked;
+  saveState();
   init();
 }
 
@@ -58,36 +60,7 @@ function closeModal() {
   console.log(modal.classList.value);
 }
 
-const technologies = [
-  {
-    id: 1,
-    title: 'HTML',
-    description: 'Html text',
-    type: 'html',
-    done: true,
-  },
-  {
-    id: 2,
-    title: 'CSS',
-    description: 'CSS text',
-    type: 'css',
-    done: false,
-  },
-  {
-    id: 3,
-    title: 'JS',
-    description: 'JS text',
-    type: 'js',
-    done: false,
-  },
-  {
-    id: 4,
-    title: 'REACT',
-    description: 'REACT text',
-    type: 'react',
-    done: false,
-  },
-];
+const technologies = getState();
 
 function init() {
   renderCards();
@@ -107,6 +80,7 @@ function renderCards() {
     content.innerHTML = technologies.map(toCard).join('');
   }
 }
+
 function renderProgress() {
   const percent = computeProgressProcent();
 
@@ -138,6 +112,7 @@ function computeProgressProcent() {
   //Math.round() округляем в меншую сторону
   return Math.round((100 * doneCount) / technologies.length);
 }
+
 function toCard(tech) {
   const doneClass = tech.done ? 'done' : '';
   return `
@@ -150,6 +125,7 @@ function toCard(tech) {
 function isInvalid(title, description) {
   return !title.value || !description.value;
 }
+
 function createTech(event) {
   //отмена поведения перезагрузки страницы
   event.preventDefault();
@@ -176,7 +152,15 @@ function createTech(event) {
   technologies.push(newTech);
   title.value = '';
   description.value = '';
+  saveState();
   init();
+}
+function saveState() {
+  localStorage.setItem(LS_KEY, JSON.stringify(technologies));
+}
+function getState() {
+  const raw = localStorage.getItem(LS_KEY);
+  return raw ? JSON.parse(raw) : [];
 }
 
 init();
